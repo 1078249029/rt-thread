@@ -12,12 +12,14 @@
 #define __BOARD_H__
 
 #include <rtconfig.h>
+#include "rttypes.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void rt_hw_board_init(void);
+void rt_hw_us_delay(rt_uint32_t us);
 
 #ifdef __cplusplus
 }
