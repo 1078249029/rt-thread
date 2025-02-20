@@ -90,6 +90,13 @@ static esp_err_t wifi_ap_receive(void *buffer, uint16_t len, void *eb)
 
 void wifi_init_sta(void)
 {
+    rt_kprintf("%s, %s, %d\n", __FILE__, __FUNCTION__, __LINE__);
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    rt_kprintf("%s, %s, %d\n", __FILE__, __FUNCTION__, __LINE__);
+    ESP_ERROR_CHECK(esp_wifi_start());
+    rt_kprintf("%s, %s, %d\n", __FILE__, __FUNCTION__, __LINE__);
+    esp_wifi_scan_start(NULL, false);
+    rt_kprintf("%s, %s, %d\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 void wifi_init_softap(void)

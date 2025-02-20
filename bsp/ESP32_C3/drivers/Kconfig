@@ -61,11 +61,46 @@ menu "On-chip Peripheral Drivers"
         select RT_USING_PIN
         default y
     
-    config BSP_USING_UART
-		bool "Enable UART"
+    menuconfig BSP_USING_UART
+		bool "Enable MSH UART"
         select RT_USING_SERIAL
         select RT_USING_SERIAL_V1
         default y
+
+    menuconfig CHIP_USING_UART
+		bool "Enable Chip UART"
+        select RT_USING_SERIAL
+        select RT_USING_SERIAL_V1
+        default n
+        if CHIP_USING_UART
+            config RT_BSP_UART0
+                bool "Enable UART0"
+                default n
+                if RT_BSP_UART0
+                    config RT_BSP_UART0_TX_PIN
+                        int "UART0 TX PIN SET"
+                        range 0 21
+                        default 0 
+                    config RT_BSP_UART0_RX_PIN
+                        int "UART0 RX PIN SET"
+                        range 0 21
+                        default 1 
+                endif
+
+            config RT_BSP_UART1
+                bool "Enable UART1"
+                default n
+                if RT_BSP_UART1
+                    config RT_BSP_UART1_TX_PIN
+                        int "UART1 TX PIN SET"
+                        range 0 21
+                        default 8 
+                    config RT_BSP_UART1_RX_PIN
+                        int "UART1 RX PIN SET"
+                        range 0 21
+                        default 9 
+                endif
+        endif
 
     menuconfig BSP_USING_I2C
         bool "Enable I2C"

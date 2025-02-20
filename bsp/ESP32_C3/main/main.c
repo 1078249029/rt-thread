@@ -82,6 +82,8 @@ void app_main()
 }
 #endif /* BSP_USING_BLE */
 
+#define USING_WIFI_IN_MAIN
+
 int main(void)
 {
     rt_kprintf("Hello!RT-THREAD!\r\n");
@@ -93,7 +95,7 @@ int main(void)
     app_main(); //该函数为nimble样例程序入口
 #endif /* BSP_USING_BLE */
 
-#ifdef RT_USING_WIFI
+#if defined (RT_USING_WIFI) && defined (USING_WIFI_IN_MAIN)
     /* set wifi work mode */
     rt_wlan_set_mode(RT_WLAN_DEVICE_STA_NAME, RT_WLAN_STATION);
     rt_wlan_set_mode(RT_WLAN_DEVICE_AP_NAME, RT_WLAN_AP);

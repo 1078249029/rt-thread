@@ -33,6 +33,7 @@ uart_hal_context_t hal[] = {
 };
 
 static struct rt_serial_device _serial;
+static struct rt_serial_device _serial1;
 
 static void mcu_uart_rx_intr_handler(void *param)
 {
@@ -130,7 +131,17 @@ int rt_hw_uart_init(void)
     _serial.ops = &_uart_ops;
     _serial.config = config;
 
-    return rt_hw_serial_register(&_serial, "uart", RT_DEVICE_FLAG_RDWR | RT_DEVICE_FLAG_INT_RX, (void *)RT_BSP_UART_PORT);
+    rt_hw_serial_register(&_serial, "uart", RT_DEVICE_FLAG_RDWR | RT_DEVICE_FLAG_INT_RX, (void *)RT_BSP_UART_PORT);
+
+    ESP_ERROR_CHECK(uart_param_config(1, &uart_config));
+    ESP_ERROR_CHECK(uart_set_pin(1, RT_BSP_UART1_TX_PIN, RT_BSP_UART1_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    ESP_ERROR_CHECK(esp_intr_alloc(uart_periph_signal[1].irq, intr_alloc_flags, mcu_uart_rx_intr_handler, (void *)&_serial, NULL));
+    ESP_ERROR_CHECK(uart_intr_config(1, &uart_intr));
+    _serial1.ops = &_uart_ops;
+    _serial1.config = config;
+
+    return rt_hw_serial_register(&_serial1, "uart1", RT_DEVICE_FLAG_RDWR | RT_DEVICE_FLAG_INT_RX, (void *)1);
+
 }
 INIT_BOARD_EXPORT(rt_hw_uart_init);
 
