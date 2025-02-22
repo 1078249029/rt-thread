@@ -368,8 +368,9 @@ void rt_object_init(struct rt_object         *object,
             node != &(information->object_list);
             node  = node->next)
     {
+        rt_kprintf("Current node: %p, next: %p, prev: %p, current name: %s\n", node, node->next, node->prev, rt_list_entry(node, struct rt_object, list)->name);
         struct rt_object *obj;
-
+        // /rt_kprintf("%s, %s, %d\n", __FILE__, __FUNCTION__, __LINE__);
         obj = rt_list_entry(node, struct rt_object, list);
         RT_ASSERT(obj != object);
     }

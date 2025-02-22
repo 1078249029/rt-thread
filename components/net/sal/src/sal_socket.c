@@ -14,7 +14,8 @@
 
 #include <string.h>
 #include <sys/time.h>
-#include <sys/ioctl.h>
+//#include <sys/ioctl.h>
+#include "/home/lzx/rt-thread/rt-thread/components/libc/compilers/common/include/sys/ioctl.h"
 #include <unistd.h>
 #include <fcntl.h>
 

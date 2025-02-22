@@ -540,6 +540,13 @@ SECTIONS
     *(.tdata.*)
     *(.tbss)
     *(.tbss.*)
+
+    . = ALIGN(4);
+    __rtatcmdtab_start = .;
+    KEEP(*(RtAtCmdTab))
+    __rtatcmdtab_end = .;
+    . = ALIGN(4);
+
     _thread_local_end = ABSOLUTE(.);
     _rodata_reserved_end = ABSOLUTE(.);
     . = ALIGN(ALIGNOF(.eh_frame));
