@@ -84,15 +84,9 @@ void app_main()
 
 // #define USING_WIFI_IN_MAIN
 
-void test(void);
 
 int main(void)
 {
-    rt_kprintf("%s, %s, %d\n", __FILE__, __FUNCTION__, __LINE__);
-    test();
-    rt_kprintf("%s, %s, %d\n", __FILE__, __FUNCTION__, __LINE__);
-    int kdb_sys_init(void);
-    void kdb_sys_start(void);
     rt_kprintf("Hello!RT-THREAD!\r\n");
     rt_pin_mode(RT_BSP_LED_PIN, PIN_MODE_OUTPUT);
 

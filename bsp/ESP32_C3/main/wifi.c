@@ -5,7 +5,7 @@
 #include "/home/lzx/rt-thread/rt-thread/components/drivers/wlan/dev_wlan_prot.h"
 #include "/home/lzx/rt-thread/rt-thread/components/drivers/wlan/dev_wlan_cfg.h"
 
-#define WLAN_SSID               "Xiaomi 13"
+#define WLAN_SSID               "rtthread"
 #define WLAN_PASSWORD           "12345678"
 #define NET_READY_TIME_OUT       (rt_tick_from_millisecond(15 * 1000))
 
