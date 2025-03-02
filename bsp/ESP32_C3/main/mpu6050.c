@@ -81,15 +81,15 @@ static rt_err_t read_reg(struct rt_i2c_bus_device *bus, rt_uint8_t len, rt_uint8
     rt_kprintf("In function %s, line %d, file: %s\n", __FUNCTION__, __LINE__, __FILE__);
 }
 
-static void read_id(rt_uint8_t* buf)
+void read_id(rt_uint8_t* buf)
 {
     write_reg(i2c_bus,MPU6050_WHO_AM_I,RT_NULL);
 	read_reg(i2c_bus, 1, buf);
 }
 
 
-static void read_data(rt_int16_t *AccX,rt_int16_t *AccY,rt_int16_t *AccZ,
-						rt_int16_t *GyroX,rt_int16_t *GyroY,rt_int16_t *GyroZ)
+void read_data(rt_int16_t *AccX,rt_int16_t *AccY,rt_int16_t *AccZ,
+			    rt_int16_t *GyroX,rt_int16_t *GyroY,rt_int16_t *GyroZ)
 {
     rt_uint8_t DataH,DataL;
 	write_reg(i2c_bus, MPU6050_ACCEL_XOUT_H,RT_NULL);
@@ -129,7 +129,7 @@ static void read_data(rt_int16_t *AccX,rt_int16_t *AccY,rt_int16_t *AccZ,
 	*GyroZ = (DataH << 8) | DataL;
 }
 
-static void mpu6050_init(const char *name)
+void mpu6050_init(const char *name)
 {
     rt_uint8_t temp[2] = {0, 0};
 

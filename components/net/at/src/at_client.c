@@ -12,6 +12,8 @@
  * 2021-07-14     Sszl         fix a buf of leaking memory
  */
 
+#include "klibc/kerrno.h"
+#include "rtthread.h"
 #include <at.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -322,7 +324,7 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char *cmd_expr
 
     if (resp != RT_NULL)
     {
-        if (rt_sem_take(client->resp_notice, resp->timeout) != RT_EOK)
+        if (rt_sem_take(client->resp_notice, 0) != RT_EOK)
         {
             LOG_W("execute command (%.*s) timeout (%d ticks)!", client->last_cmd_len, client->send_buf, resp->timeout);
             client->resp_status = AT_RESP_TIMEOUT;
@@ -336,7 +338,9 @@ int at_obj_exec_cmd(at_client_t client, at_response_t resp, const char *cmd_expr
     }
 
     client->resp = RT_NULL;
-
+    // if(rt_sem_release(client->resp_notice)!=RT_EOK){
+    //     LOG_E("rt_sem_release(client->resp_notice) failed!");
+    // }
     rt_mutex_release(client->lock);
 
     return result;
