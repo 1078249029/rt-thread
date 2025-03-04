@@ -120,7 +120,8 @@
 /**
  * @defgroup audio_dsp AUDIO_DSP
  *
- * @brief Support Dsp(input/output) Units controls
+ * @brief Support Dsp(input/output) Units controls. The macro group from application level, can  
+ *        set audio mixer parameters including samplerate, channels etc.  
  */
 
 /**
@@ -136,7 +137,8 @@
 /**
  * @defgroup audio_mixer AUDIO_MIXER
  *
- * @brief Supported Mixer Units controls
+ * @brief Supported Mixer Units controls. The macro group from driver level, can set audio mixer  
+ *        parameters including volume, frequence db, microphone etc. 
  */
 
 /**
@@ -181,25 +183,30 @@ enum
  */
 struct rt_audio_buf_info
 {
-    rt_uint8_t *buffer;
-    rt_uint16_t block_size;
-    rt_uint16_t block_count;
-    rt_uint32_t total_size;
+    rt_uint8_t *buffer; /**< Audio buffer information */
+    rt_uint16_t block_size; /**< Audio block_size information for replay function */
+    rt_uint16_t block_count; /**< Audio block_count information for replay function */
+    rt_uint32_t total_size; /**< Audio total_size which is equal to block_size multiplying 
+                                block_count information for replay function */
+                                 
 };
 
 struct rt_audio_device;
 struct rt_audio_caps;
 struct rt_audio_configure;
+
+/**
+ * @brief Aduio device operators
+ */
 struct rt_audio_ops
 {
-    rt_err_t (*getcaps)(struct rt_audio_device *audio, struct rt_audio_caps *caps);
-    rt_err_t (*configure)(struct rt_audio_device *audio, struct rt_audio_caps *caps);
-    rt_err_t (*init)(struct rt_audio_device *audio);
-    rt_err_t (*start)(struct rt_audio_device *audio, int stream);
-    rt_err_t (*stop)(struct rt_audio_device *audio, int stream);
-    rt_ssize_t (*transmit)(struct rt_audio_device *audio, const void *writeBuf, void *readBuf, rt_size_t size);
-    /* get page size of codec or private buffer's info */
-    void (*buffer_info)(struct rt_audio_device *audio, struct rt_audio_buf_info *info);
+    rt_err_t (*getcaps)(struct rt_audio_device *audio, struct rt_audio_caps *caps); /**< Get audio capabilities information */
+    rt_err_t (*configure)(struct rt_audio_device *audio, struct rt_audio_caps *caps); /**< Configure audio devices */
+    rt_err_t (*init)(struct rt_audio_device *audio); /**< Initialize audio device */
+    rt_err_t (*start)(struct rt_audio_device *audio, int stream); /**< Turn on the audio device */
+    rt_err_t (*stop)(struct rt_audio_device *audio, int stream); /**< Turn off the audio device */
+    rt_ssize_t (*transmit)(struct rt_audio_device *audio, const void *writeBuf, void *readBuf, rt_size_t size); /**< Transmit data between application and device */
+    void (*buffer_info)(struct rt_audio_device *audio, struct rt_audio_buf_info *info); /**< Get page size of codec or private buffer's info */
 };
 
 /**
@@ -211,9 +218,9 @@ struct rt_audio_ops
  */
 struct rt_audio_configure
 {
-    rt_uint32_t samplerate;
-    rt_uint16_t channels;
-    rt_uint16_t samplebits;
+    rt_uint32_t samplerate; /**< Audio samplerate information */
+    rt_uint16_t channels; /**< Audio channels information */
+    rt_uint16_t samplebits; /**< Audio samplebits information */
 };
 
 /**
@@ -221,15 +228,15 @@ struct rt_audio_configure
  */
 struct rt_audio_caps
 {
-    int main_type;
-    int sub_type;
+    int main_type; /**< Audio main type, one value of @ref audio_type */
+    int sub_type; /**< Audio sub type, one value of @ref audio_dsp @ref audio_mixer */
 
     union
     {
-        rt_uint32_t mask;
-        int     value;
-        struct rt_audio_configure config;
-    } udata;
+        rt_uint32_t mask; /**< Capabilities mask */
+        int     value; /**< Capabilities value */
+        struct rt_audio_configure config; /**< Audio samplebits information */
+    } udata; /**< User data */
 };
 
 /**
@@ -237,17 +244,19 @@ struct rt_audio_caps
  */
 struct rt_audio_replay
 {
-    struct rt_mempool *mp;
-    struct rt_data_queue queue;
-    struct rt_mutex lock;
-    struct rt_completion cmp;
-    struct rt_audio_buf_info buf_info;
-    rt_uint8_t *write_data;
-    rt_uint16_t write_index;
-    rt_uint16_t read_index;
-    rt_uint32_t pos;
-    rt_uint8_t event;
-    rt_bool_t activated;
+    struct rt_mempool *mp; /**< Memory pool for audio replay */
+    struct rt_data_queue queue; /**< Replay data queue */
+    struct rt_mutex lock; /**< Replay mutex lock*/
+    struct rt_completion cmp; /**< Replay completion, it will be  */
+    struct rt_audio_buf_info buf_info; /**< Replay buffer information */
+    rt_uint8_t *write_data; /**< Pointer to the data to be written into data queue */
+    rt_uint16_t write_index; /**< Index of pointer write_data.It records how much data
+                                 has been written in currently being played block */
+    rt_uint16_t read_index; /**< Index of replaying data for audio device, it indicates index of replay
+                                 in the blocks which is currently being played */
+    rt_uint32_t pos; /**< Global position of audio replay */
+    rt_uint8_t event; /**< Event flag */
+    rt_bool_t activated; /**< Activaty flag */
 };
 
 /**
@@ -264,10 +273,10 @@ struct rt_audio_record
  */
 struct rt_audio_device
 {
-    struct rt_device           parent;
-    struct rt_audio_ops        *ops;
-    struct rt_audio_replay     *replay;
-    struct rt_audio_record     *record;
+    struct rt_device           parent; /**< Audio device parents */
+    struct rt_audio_ops        *ops; /**< Audio device operator*/
+    struct rt_audio_replay     *replay; /**< Pointer to audio replay structure */
+    struct rt_audio_record     *record; /**< Pointer to audio record structure */
 };
 
 rt_err_t    rt_audio_register(struct rt_audio_device *audio, const char *name, rt_uint32_t flag, void *data);
@@ -277,7 +286,8 @@ void        rt_audio_rx_done(struct rt_audio_device *audio, rt_uint8_t *pbuf, rt
 /**
  * @defgroup audio_codec_cmd CODEC_CMD
  *
- * @brief Device Control Commands
+ * @brief Device Control Commands. The macro group from hardware level, can set codec 
+ *        parametes including volume, EQ and 3D etc.
  */
 
 /**

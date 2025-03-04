@@ -23,7 +23,7 @@
 #endif
 
 /**
- * @addtogroup group_AudioPipe
+ * @addtogroup group_Audio
  */
 
 /** @{ */
