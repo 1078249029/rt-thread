@@ -2,6 +2,7 @@
 #include "rthw.h"
 #include "rttypes.h"
 #include <stdlib.h>
+#include <stdio.h>
 //#include <string.h>
 #include <rtthread.h>
 #include <at.h>
@@ -49,7 +50,7 @@ int at_cwmode(rt_int8_t mode)
             result = at_exec_cmd(resp, "AT+CWMODE=3");
             if (result != RT_EOK)
             {
-                LOG_E("at_cwmode=3 error!");
+                LOG_E("at_cwmode=3 error!,error code = %d",result);
                 goto __exit;
             }
             break;
@@ -300,7 +301,7 @@ int at_senddata(char* data)
     result = at_exec_cmd(resp, data);
     if (result != RT_EOK)
     {
-        LOG_E("at_senddata error!");
+        LOG_E("at_senddata error!, error code = %d",result);
         goto __exit;
     }
 
@@ -468,15 +469,24 @@ __exit:
 int at_client_test(void)
 {
     char protol[]={"\"TCP\""};
-    char ip[]={"\"192.168.90.190\""};
+    char ip[]={"\"192.168.137.190\""};
     char port[]={"8080"};
-    rt_int16_t mpu6050_data[7]={};
-    char mpu6050_char1[6];
-    char mpu6050_char2[6];
-    char mpu6050_char3[6];
-    char mpu6050_char4[6];
-    char mpu6050_char5[6];
-    char mpu6050_char6[6];
+    float mpu6050_data[7]={};
+    
+    char ax_char[6];
+    char ay_char[6];
+    char az_char[6];
+    char gyrox_char[6];
+    char gyroy_char[6];
+    char gyroz_char[6];
+
+    float ax_float;
+    float ay_float;
+    float az_float;
+    float gyrox_float;
+    float gyroy_float;
+    float gyroz_float;
+
     char dest[50];
     char comma[]={","};
 
@@ -500,41 +510,46 @@ int at_client_test(void)
     at_cipsend();
     rt_thread_mdelay(COMMAND_DELAY);
     
-    //rt_base_t level = rt_hw_interrupt_disable();
-    
     read_id(&buf);
     utoa((unsigned int)buf, &mpu6050_id_char[0], 10);
     at_senddata("id: ");
     at_senddata(mpu6050_id_char);
     at_senddata("data: ");
-    for(int i = 0; i < 100; i++){
+    for(int i = 0; i < 1500; i++){
         /* 读取温湿度数据 */
-        read_data(&mpu6050_data[0],&mpu6050_data[1],&mpu6050_data[2], &mpu6050_data[3],&mpu6050_data[4],&mpu6050_data[5]);
-        itoa((int)mpu6050_data[0], mpu6050_char1, 10);
-        itoa((int)mpu6050_data[1], mpu6050_char2, 10);
-        itoa((int)mpu6050_data[2], mpu6050_char3, 10);
-        itoa((int)mpu6050_data[3], mpu6050_char4, 10);
-        itoa((int)mpu6050_data[4], mpu6050_char5, 10);
-        itoa((int)mpu6050_data[5], mpu6050_char6, 10);
+        read_signed_data(mpu6050_data);
+        
+        ax_float = (mpu6050_data[0]);
+        ay_float = (mpu6050_data[1]);
+        az_float = (mpu6050_data[2]);
 
-        strcat(dest, mpu6050_char1);
+        gyrox_float = (mpu6050_data[3]);
+        gyroy_float = (mpu6050_data[4]);
+        gyroz_float = (mpu6050_data[5]);
+
+        sprintf(ax_char,"%.2f",ax_float);
+        sprintf(ay_char,"%.2f",ay_float);
+        sprintf(az_char,"%.2f",az_float);
+        sprintf(gyrox_char,"%.2f",gyrox_float);
+        sprintf(gyroy_char,"%.2f",gyroy_float);
+        sprintf(gyroz_char,"%.2f",gyroz_float);
+
+        strcat(dest, ax_char);
         strcat(dest, comma);
-        strcat(dest, mpu6050_char2);
+        strcat(dest, ay_char);
         strcat(dest, comma);
-        strcat(dest, mpu6050_char3);
+        strcat(dest, az_char);
         strcat(dest, comma);
-        strcat(dest, mpu6050_char4);
+        strcat(dest, gyrox_char);
         strcat(dest, comma);
-        strcat(dest, mpu6050_char5);
+        strcat(dest, gyroy_char);
         strcat(dest, comma);
-        strcat(dest, mpu6050_char6);
+        strcat(dest, gyroz_char);
 
         at_senddata(dest);
-        rt_memset(dest, DATA_DELAY, sizeof(dest));
+        rt_memset(dest, 0, sizeof(dest));
         rt_thread_mdelay(10);
     }
-
-    //rt_hw_interrupt_enable(level);
 
     rt_thread_mdelay(COMMAND_DELAY);
     at_stopsend();

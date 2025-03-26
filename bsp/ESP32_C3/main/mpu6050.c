@@ -16,6 +16,8 @@
 #include "mpu6050_reg.h"
 #include "rttypes.h"
 
+#include <math.h>
+
 //result = i2c_master_write_byte(cmd, msg->addr << 1 | WRITE_BIT, ACK_CHECK_EN);
 #define MPU6050_ADDR	0x68 //不是 0xD0
 
@@ -129,6 +131,48 @@ void read_data(rt_int16_t *AccX,rt_int16_t *AccY,rt_int16_t *AccZ,
 	*GyroZ = (DataH << 8) | DataL;
 }
 
+void read_signed_data(float *data)
+{
+    //1. 原始数据获取
+	float accx,accy,accz;//三方向角加速度值
+    rt_int16_t raw_data[6];
+	//获取加速度传感器数据
+    read_data(&raw_data[0], &raw_data[1], &raw_data[2], &raw_data[3], &raw_data[4], &raw_data[5]);
+
+	float accel_x = raw_data[0];//x轴加速度值暂存
+	float accel_y = raw_data[1];//y轴加速度值暂存
+	float accel_z = raw_data[2];//z轴加速度值暂存
+	float gyro_x  = raw_data[3];//x轴陀螺仪值暂存
+	float gyro_y  = raw_data[4];//y轴陀螺仪值暂存
+	float gyro_z  = raw_data[5];//z轴陀螺仪值暂存
+	
+	//2.角加速度原始值处理过程	
+	//加速度传感器配置寄存器0X1C内写入0x01,设置范围为±16g。换算关系：2^16/16 = 2048LSB/g
+	if(accel_x<32764) accx=accel_x/2048.0;//计算x轴加速度
+	else              accx=1-(accel_x-65536)/2048.0;
+	if(accel_y<32764) accy=accel_y/2048.0;//计算y轴加速度
+	else              accy=1-(accel_y-65536)/2048.0;
+	if(accel_z<32764) accz=accel_z/2048.0;//计算z轴加速度
+	else              accz=(accel_z-65536)/2048.0;
+	
+	//3.角速度原始值处理过程
+	//陀螺仪配置寄存器0X1B内写入0x18，设置范围为±2000deg/s。换算关系：2^16/4000=16.4LSB/(°/S)
+	////计算角速度
+	if(gyro_x<32768) gyro_x=-(gyro_x/16.4);
+	if(gyro_x>32768) gyro_x=+(65535-gyro_x)/16.4;
+	if(gyro_y<32768) gyro_y=-(gyro_y/16.4);
+	if(gyro_y>32768) gyro_y=+(65535-gyro_y)/16.4;
+	if(gyro_z<32768) gyro_z=-(gyro_z/16.4);
+	if(gyro_z>32768) gyro_z=+(65535-gyro_z)/16.4;
+
+    data[0] = accx;
+    data[1] = accy;
+    data[2] = accz;
+    data[3] = gyro_x;
+    data[4] = gyro_y;
+    data[5] = gyro_z;
+}
+
 void mpu6050_init(const char *name)
 {
     rt_uint8_t temp[2] = {0, 0};
@@ -150,9 +194,9 @@ void mpu6050_init(const char *name)
         write_reg(i2c_bus,MPU6050_SMPLRT_DIV,&data);
         data = 0x06;
         write_reg(i2c_bus,MPU6050_CONFIG,&data);
-        data = 0x18;
+        data = 0x18;    //range:± 2000 °/s sensitivity:16.4 LSB/°/s
         write_reg(i2c_bus,MPU6050_GYRO_CONFIG,&data);
-        data = 0x18;
+        data = 0x18;    //range:± 16g
         write_reg(i2c_bus,MPU6050_ACCEL_CONFIG,&data); 
 
         initialized = RT_TRUE;
