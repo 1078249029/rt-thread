@@ -41,11 +41,22 @@ struct esp32c3_i2c
         .bus_name = "i2c0",                              \
     }
 #endif
+#if defined(BSP_USING_SW_I2C1)
+#define SW_I2C1_BUS_CONFIG                               \
+    {                                                    \
+        .scl = BSP_SW_I2C1_SCL_PIN,                      \
+        .sda = BSP_SW_I2C1_SDA_PIN,                      \
+        .bus_name = "i2c1",                              \
+    }
+#endif
 
 static const struct esp32c3_soft_i2c_config soft_i2c_config[] =
 {
 #if defined(BSP_USING_SW_I2C0)
     SW_I2C0_BUS_CONFIG,
+#endif
+#if defined(BSP_USING_SW_I2C1)
+    SW_I2C1_BUS_CONFIG,
 #endif
 };
 

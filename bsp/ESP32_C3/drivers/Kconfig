@@ -128,6 +128,20 @@ menu "On-chip Peripheral Drivers"
                                 range 0 21
                                 default 19
                         endif
+
+                    config BSP_USING_SW_I2C1
+                        bool "Enable SoftWare I2C1"
+                        default n
+                        if BSP_USING_SW_I2C1
+                            config BSP_SW_I2C1_SDA_PIN
+                                int "SWI2C1 sda pin number"
+                                range 0 21
+                                default 4
+                            config BSP_SW_I2C1_SCL_PIN
+                                int "SWI2C1 scl pin number"
+                                range 0 21
+                                default 5
+                        endif
                 endif
         endif
 

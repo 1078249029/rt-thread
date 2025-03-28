@@ -471,23 +471,37 @@ int at_client_test(void)
     char protol[]={"\"TCP\""};
     char ip[]={"\"192.168.137.190\""};
     char port[]={"8080"};
-    float mpu6050_data[7]={};
+    float mpu6050_data[14]={};
     
-    char ax_char[6];
-    char ay_char[6];
-    char az_char[6];
-    char gyrox_char[6];
-    char gyroy_char[6];
-    char gyroz_char[6];
+    char ax1_char[6];
+    char ay1_char[6];
+    char az1_char[6];
+    char gyrox1_char[6];
+    char gyroy1_char[6];
+    char gyroz1_char[6];
 
-    float ax_float;
-    float ay_float;
-    float az_float;
-    float gyrox_float;
-    float gyroy_float;
-    float gyroz_float;
+    float ax1_float;
+    float ay1_float;
+    float az1_float;
+    float gyrox1_float;
+    float gyroy1_float;
+    float gyroz1_float;
+    
+    char ax2_char[6];
+    char ay2_char[6];
+    char az2_char[6];
+    char gyrox2_char[6];
+    char gyroy2_char[6];
+    char gyroz2_char[6];
 
-    char dest[50];
+    float ax2_float;
+    float ay2_float;
+    float az2_float;
+    float gyrox2_float;
+    float gyroy2_float;
+    float gyroz2_float;
+
+    char dest[100];
     char comma[]={","};
 
     rt_uint8_t buf;
@@ -495,6 +509,7 @@ int at_client_test(void)
     char mpu6050_id_char[5];
 
     mpu6050_init("i2c0");
+    mpu6050_init("i2c1");
 
     at_cwmode(3);
     at_rst();
@@ -519,36 +534,63 @@ int at_client_test(void)
         /* 读取温湿度数据 */
         read_signed_data(mpu6050_data);
         
-        ax_float = (mpu6050_data[0]);
-        ay_float = (mpu6050_data[1]);
-        az_float = (mpu6050_data[2]);
+        ax1_float = (mpu6050_data[0]);
+        ay1_float = (mpu6050_data[1]);
+        az1_float = (mpu6050_data[2]);
 
-        gyrox_float = (mpu6050_data[3]);
-        gyroy_float = (mpu6050_data[4]);
-        gyroz_float = (mpu6050_data[5]);
+        gyrox1_float = (mpu6050_data[3]);
+        gyroy1_float = (mpu6050_data[4]);
+        gyroz1_float = (mpu6050_data[5]);
 
-        sprintf(ax_char,"%.2f",ax_float);
-        sprintf(ay_char,"%.2f",ay_float);
-        sprintf(az_char,"%.2f",az_float);
-        sprintf(gyrox_char,"%.2f",gyrox_float);
-        sprintf(gyroy_char,"%.2f",gyroy_float);
-        sprintf(gyroz_char,"%.2f",gyroz_float);
+        ax2_float = (mpu6050_data[6]);
+        ay2_float = (mpu6050_data[7]);
+        az2_float = (mpu6050_data[8]);
 
-        strcat(dest, ax_char);
+        gyrox2_float = (mpu6050_data[9]);
+        gyroy2_float = (mpu6050_data[10]);
+        gyroz2_float = (mpu6050_data[11]);
+
+        sprintf(ax1_char,"%.2f",ax1_float);
+        sprintf(ay1_char,"%.2f",ay1_float);
+        sprintf(az1_char,"%.2f",az1_float);
+        sprintf(gyrox1_char,"%.2f",gyrox1_float);
+        sprintf(gyroy1_char,"%.2f",gyroy1_float);
+        sprintf(gyroz1_char,"%.2f",gyroz1_float);
+
+        sprintf(ax2_char,"%.2f",ax2_float);
+        sprintf(ay2_char,"%.2f",ay2_float);
+        sprintf(az2_char,"%.2f",az2_float);
+        sprintf(gyrox2_char,"%.2f",gyrox2_float);
+        sprintf(gyroy2_char,"%.2f",gyroy2_float);
+        sprintf(gyroz2_char,"%.2f",gyroz2_float);
+
+        strcat(dest, ax1_char);
         strcat(dest, comma);
-        strcat(dest, ay_char);
+        strcat(dest, ay1_char);
         strcat(dest, comma);
-        strcat(dest, az_char);
+        strcat(dest, az1_char);
         strcat(dest, comma);
-        strcat(dest, gyrox_char);
+        strcat(dest, gyrox1_char);
         strcat(dest, comma);
-        strcat(dest, gyroy_char);
+        strcat(dest, gyroy1_char);
         strcat(dest, comma);
-        strcat(dest, gyroz_char);
+        strcat(dest, gyroz1_char);
+
+        strcat(dest, ax2_char);
+        strcat(dest, comma);
+        strcat(dest, ay2_char);
+        strcat(dest, comma);
+        strcat(dest, az2_char);
+        strcat(dest, comma);
+        strcat(dest, gyrox2_char);
+        strcat(dest, comma);
+        strcat(dest, gyroy2_char);
+        strcat(dest, comma);
+        strcat(dest, gyroz2_char);
 
         at_senddata(dest);
         rt_memset(dest, 0, sizeof(dest));
-        rt_thread_mdelay(10);
+        rt_thread_mdelay(20);
     }
 
     rt_thread_mdelay(COMMAND_DELAY);

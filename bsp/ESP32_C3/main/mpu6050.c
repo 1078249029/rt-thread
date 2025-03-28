@@ -134,43 +134,74 @@ void read_data(rt_int16_t *AccX,rt_int16_t *AccY,rt_int16_t *AccZ,
 void read_signed_data(float *data)
 {
     //1. 原始数据获取
-	float accx,accy,accz;//三方向角加速度值
-    rt_int16_t raw_data[6];
-	//获取加速度传感器数据
-    read_data(&raw_data[0], &raw_data[1], &raw_data[2], &raw_data[3], &raw_data[4], &raw_data[5]);
+	float accx1,accy1,accz1;//三方向角加速度值
+    float accx2,accy2,accz2;//三方向角加速度值
+    rt_int16_t raw_data1[6];
+    rt_int16_t raw_data2[6];
 
-	float accel_x = raw_data[0];//x轴加速度值暂存
-	float accel_y = raw_data[1];//y轴加速度值暂存
-	float accel_z = raw_data[2];//z轴加速度值暂存
-	float gyro_x  = raw_data[3];//x轴陀螺仪值暂存
-	float gyro_y  = raw_data[4];//y轴陀螺仪值暂存
-	float gyro_z  = raw_data[5];//z轴陀螺仪值暂存
-	
+	//获取加速度传感器数据
+    read_data(&raw_data1[0], &raw_data1[1], &raw_data1[2], &raw_data1[3], &raw_data1[4], &raw_data1[5]);
+    read_data(&raw_data2[0], &raw_data2[1], &raw_data2[2], &raw_data2[3], &raw_data2[4], &raw_data2[5]);
+
+	float accel1_x = raw_data1[0];//x轴加速度值暂存
+	float accel1_y = raw_data1[1];//y轴加速度值暂存
+	float accel1_z = raw_data1[2];//z轴加速度值暂存
+	float gyro1_x  = raw_data1[3];//x轴陀螺仪值暂存
+	float gyro1_y  = raw_data1[4];//y轴陀螺仪值暂存
+	float gyro1_z  = raw_data1[5];//z轴陀螺仪值暂存
+    float accel2_x = raw_data2[0];//x轴加速度值暂存
+	float accel2_y = raw_data2[1];//y轴加速度值暂存
+	float accel2_z = raw_data2[2];//z轴加速度值暂存
+	float gyro2_x  = raw_data2[3];//x轴陀螺仪值暂存
+	float gyro2_y  = raw_data2[4];//y轴陀螺仪值暂存
+	float gyro2_z  = raw_data2[5];//z轴陀螺仪值暂存
+
 	//2.角加速度原始值处理过程	
 	//加速度传感器配置寄存器0X1C内写入0x01,设置范围为±16g。换算关系：2^16/16 = 2048LSB/g
-	if(accel_x<32764) accx=accel_x/2048.0;//计算x轴加速度
-	else              accx=1-(accel_x-65536)/2048.0;
-	if(accel_y<32764) accy=accel_y/2048.0;//计算y轴加速度
-	else              accy=1-(accel_y-65536)/2048.0;
-	if(accel_z<32764) accz=accel_z/2048.0;//计算z轴加速度
-	else              accz=(accel_z-65536)/2048.0;
+	if(accel1_x<32764) accx1=accel1_x/2048.0;//计算x轴加速度
+	else               accx1=1-(accel1_x-65536)/2048.0;
+	if(accel1_y<32764) accy1=accel1_y/2048.0;//计算y轴加速度
+	else               accy1=1-(accel1_y-65536)/2048.0;
+	if(accel1_z<32764) accz1=accel1_z/2048.0;//计算z轴加速度
+	else               accz1=(accel1_z-65536)/2048.0;
 	
+    if(accel2_x<32764) accx2=accel2_x/2048.0;//计算x轴加速度
+	else               accx2=1-(accel2_x-65536)/2048.0;
+	if(accel2_y<32764) accy2=accel2_y/2048.0;//计算y轴加速度
+	else               accy2=1-(accel2_y-65536)/2048.0;
+	if(accel2_z<32764) accz2=accel2_z/2048.0;//计算z轴加速度
+	else               accz2=(accel2_z-65536)/2048.0;
+
 	//3.角速度原始值处理过程
 	//陀螺仪配置寄存器0X1B内写入0x18，设置范围为±2000deg/s。换算关系：2^16/4000=16.4LSB/(°/S)
 	////计算角速度
-	if(gyro_x<32768) gyro_x=-(gyro_x/16.4);
-	if(gyro_x>32768) gyro_x=+(65535-gyro_x)/16.4;
-	if(gyro_y<32768) gyro_y=-(gyro_y/16.4);
-	if(gyro_y>32768) gyro_y=+(65535-gyro_y)/16.4;
-	if(gyro_z<32768) gyro_z=-(gyro_z/16.4);
-	if(gyro_z>32768) gyro_z=+(65535-gyro_z)/16.4;
+	if(gyro1_x<32768) gyro1_x=-(gyro1_x/16.4);
+	if(gyro1_x>32768) gyro1_x=+(65535-gyro1_x)/16.4;
+	if(gyro1_y<32768) gyro1_y=-(gyro1_y/16.4);
+	if(gyro1_y>32768) gyro1_y=+(65535-gyro1_y)/16.4;
+	if(gyro1_z<32768) gyro1_z=-(gyro1_z/16.4);
+	if(gyro1_z>32768) gyro1_z=+(65535-gyro1_z)/16.4;
 
-    data[0] = accx;
-    data[1] = accy;
-    data[2] = accz;
-    data[3] = gyro_x;
-    data[4] = gyro_y;
-    data[5] = gyro_z;
+
+    if(gyro2_x<32768) gyro2_x=-(gyro2_x/16.4);
+	if(gyro2_x>32768) gyro2_x=+(65535-gyro2_x)/16.4;
+	if(gyro2_y<32768) gyro2_y=-(gyro2_y/16.4);
+	if(gyro2_y>32768) gyro2_y=+(65535-gyro2_y)/16.4;
+	if(gyro2_z<32768) gyro2_z=-(gyro2_z/16.4);
+	if(gyro2_z>32768) gyro2_z=+(65535-gyro2_z)/16.4;
+
+    data[0] = accx1;
+    data[1] = accy1;
+    data[2] = accz1;
+    data[3] = gyro1_x;
+    data[4] = gyro1_y;
+    data[5] = gyro1_z;
+    data[6] = accx2;
+    data[7] = accy2;
+    data[8] = accz2;
+    data[9] = gyro2_x;
+    data[10] = gyro2_y;
+    data[11] = gyro2_z;
 }
 
 void mpu6050_init(const char *name)

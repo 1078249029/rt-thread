@@ -61,17 +61,6 @@ void spi_w25q_sample(void)
 }
 MSH_CMD_EXPORT(spi_w25q_sample, spi w25q sample);
 
-/*
- *todo: todo: iic read data by mpu6050
- *
- */
-
-void read_mpu6050_sample(void)
-{
-
-}
-MSH_CMD_EXPORT(read_mpu6050_sample, read mpu6050 sample);
-
 #ifdef BSP_USING_BLE
 void app_main()
 {
