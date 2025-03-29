@@ -469,9 +469,9 @@ __exit:
 int at_client_test(void)
 {
     char protol[]={"\"TCP\""};
-    char ip[]={"\"192.168.137.190\""};
+    char ip[]={"\"192.168.40.190\""};
     char port[]={"8080"};
-    float mpu6050_data[14]={};
+    float mpu6050_data[14]={0};
     
     char ax1_char[6];
     char ay1_char[6];
@@ -487,12 +487,12 @@ int at_client_test(void)
     float gyroy1_float;
     float gyroz1_float;
     
-    char ax2_char[6];
-    char ay2_char[6];
-    char az2_char[6];
-    char gyrox2_char[6];
-    char gyroy2_char[6];
-    char gyroz2_char[6];
+    char ax2_char[6] = {0};
+    char ay2_char[6] = {0};
+    char az2_char[6] = {0};
+    char gyrox2_char[6] = {0};
+    char gyroy2_char[6] = {0};
+    char gyroz2_char[6] = {0};
 
     float ax2_float;
     float ay2_float;
@@ -501,7 +501,7 @@ int at_client_test(void)
     float gyroy2_float;
     float gyroz2_float;
 
-    char dest[100];
+    char dest[100] = {0};
     char comma[]={","};
 
     rt_uint8_t buf;
@@ -533,7 +533,6 @@ int at_client_test(void)
     for(int i = 0; i < 1500; i++){
         /* 读取温湿度数据 */
         read_signed_data(mpu6050_data);
-        
         ax1_float = (mpu6050_data[0]);
         ay1_float = (mpu6050_data[1]);
         az1_float = (mpu6050_data[2]);
@@ -549,7 +548,6 @@ int at_client_test(void)
         gyrox2_float = (mpu6050_data[9]);
         gyroy2_float = (mpu6050_data[10]);
         gyroz2_float = (mpu6050_data[11]);
-
         sprintf(ax1_char,"%.2f",ax1_float);
         sprintf(ay1_char,"%.2f",ay1_float);
         sprintf(az1_char,"%.2f",az1_float);
@@ -563,7 +561,6 @@ int at_client_test(void)
         sprintf(gyrox2_char,"%.2f",gyrox2_float);
         sprintf(gyroy2_char,"%.2f",gyroy2_float);
         sprintf(gyroz2_char,"%.2f",gyroz2_float);
-
         strcat(dest, ax1_char);
         strcat(dest, comma);
         strcat(dest, ay1_char);
@@ -575,6 +572,7 @@ int at_client_test(void)
         strcat(dest, gyroy1_char);
         strcat(dest, comma);
         strcat(dest, gyroz1_char);
+        strcat(dest, comma);
 
         strcat(dest, ax2_char);
         strcat(dest, comma);
@@ -587,7 +585,6 @@ int at_client_test(void)
         strcat(dest, gyroy2_char);
         strcat(dest, comma);
         strcat(dest, gyroz2_char);
-
         at_senddata(dest);
         rt_memset(dest, 0, sizeof(dest));
         rt_thread_mdelay(20);
