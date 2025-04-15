@@ -16,18 +16,14 @@
 #include "mpu6050_reg.h"
 #include "rttypes.h"
 
-#include <math.h>
-
-//result = i2c_master_write_byte(cmd, msg->addr << 1 | WRITE_BIT, ACK_CHECK_EN);
 #define MPU6050_ADDR	0x68 //不是 0xD0
 
-#define MPU6050_I2C_BUS_NAME          "i2c0"  /* 传感器连接的I2C总线设备名称 */
+#define MPU6050_I2C_BUS_NAME        "i2c0"  /* 传感器连接的I2C总线设备名称 */
 #define AHT10_ADDR                  0x38    /* 从机地址 */
 #define AHT10_CALIBRATION_CMD       0xE1    /* 校准命令 */
 #define AHT10_NORMAL_CMD            0xA8    /* 一般命令 */
 #define AHT10_GET_DATA              0xAC    /* 获取数据命令 */
 
-static struct rt_i2c_bus_device *i2c_bus = RT_NULL;     /* I2C总线设备句柄 */
 static rt_bool_t initialized = RT_FALSE;                /* 传感器初始化状态 */
 
 /* 写传感器寄存器 */
@@ -83,14 +79,14 @@ static rt_err_t read_reg(struct rt_i2c_bus_device *bus, rt_uint8_t len, rt_uint8
     rt_kprintf("In function %s, line %d, file: %s\n", __FUNCTION__, __LINE__, __FILE__);
 }
 
-void read_id(rt_uint8_t* buf)
+void read_id(struct rt_i2c_bus_device *i2c_bus, rt_uint8_t* buf)
 {
     write_reg(i2c_bus,MPU6050_WHO_AM_I,RT_NULL);
 	read_reg(i2c_bus, 1, buf);
 }
 
 
-void read_data(rt_int16_t *AccX,rt_int16_t *AccY,rt_int16_t *AccZ,
+void read_data(struct rt_i2c_bus_device *i2c_bus, rt_int16_t *AccX,rt_int16_t *AccY,rt_int16_t *AccZ,
 			    rt_int16_t *GyroX,rt_int16_t *GyroY,rt_int16_t *GyroZ)
 {
     rt_uint8_t DataH,DataL;
@@ -131,83 +127,41 @@ void read_data(rt_int16_t *AccX,rt_int16_t *AccY,rt_int16_t *AccZ,
 	*GyroZ = (DataH << 8) | DataL;
 }
 
-void read_signed_data(float *data)
+void read_signed_data(struct rt_i2c_bus_device *i2c_bus, float *data)
 {
     //1. 原始数据获取
-	float accx1,accy1,accz1;//三方向角加速度值
-    float accx2,accy2,accz2;//三方向角加速度值
-    rt_int16_t raw_data1[6];
-    rt_int16_t raw_data2[6];
+	float accx,accy,accz;//三方向角加速度值
+    rt_int16_t raw_data[6];
 
 	//获取加速度传感器数据
-    read_data(&raw_data1[0], &raw_data1[1], &raw_data1[2], &raw_data1[3], &raw_data1[4], &raw_data1[5]);
-    read_data(&raw_data2[0], &raw_data2[1], &raw_data2[2], &raw_data2[3], &raw_data2[4], &raw_data2[5]);
-
-	float accel1_x = raw_data1[0];//x轴加速度值暂存
-	float accel1_y = raw_data1[1];//y轴加速度值暂存
-	float accel1_z = raw_data1[2];//z轴加速度值暂存
-	float gyro1_x  = raw_data1[3];//x轴陀螺仪值暂存
-	float gyro1_y  = raw_data1[4];//y轴陀螺仪值暂存
-	float gyro1_z  = raw_data1[5];//z轴陀螺仪值暂存
-    float accel2_x = raw_data2[0];//x轴加速度值暂存
-	float accel2_y = raw_data2[1];//y轴加速度值暂存
-	float accel2_z = raw_data2[2];//z轴加速度值暂存
-	float gyro2_x  = raw_data2[3];//x轴陀螺仪值暂存
-	float gyro2_y  = raw_data2[4];//y轴陀螺仪值暂存
-	float gyro2_z  = raw_data2[5];//z轴陀螺仪值暂存
+    read_data(i2c_bus, &raw_data[0], &raw_data[1], &raw_data[2], &raw_data[3], &raw_data[4], &raw_data[5]);
 
 	//2.角加速度原始值处理过程	
-	//加速度传感器配置寄存器0X1C内写入0x01,设置范围为±16g。换算关系：2^16/16 = 2048LSB/g
-	if(accel1_x<32764) accx1=accel1_x/2048.0;//计算x轴加速度
-	else               accx1=1-(accel1_x-65536)/2048.0;
-	if(accel1_y<32764) accy1=accel1_y/2048.0;//计算y轴加速度
-	else               accy1=1-(accel1_y-65536)/2048.0;
-	if(accel1_z<32764) accz1=accel1_z/2048.0;//计算z轴加速度
-	else               accz1=(accel1_z-65536)/2048.0;
-	
-    if(accel2_x<32764) accx2=accel2_x/2048.0;//计算x轴加速度
-	else               accx2=1-(accel2_x-65536)/2048.0;
-	if(accel2_y<32764) accy2=accel2_y/2048.0;//计算y轴加速度
-	else               accy2=1-(accel2_y-65536)/2048.0;
-	if(accel2_z<32764) accz2=accel2_z/2048.0;//计算z轴加速度
-	else               accz2=(accel2_z-65536)/2048.0;
+	//加速度传感器配置寄存器0X1C内写入0x01,设置范围为±16g。换算关系：2^16/(16*2) = 2048LSB/g
+    accx = (float)raw_data[0] / 2048.0;
+    accy = (float)raw_data[1] / 2048.0;
+    accz = (float)raw_data[2] / 2048.0;
 
 	//3.角速度原始值处理过程
-	//陀螺仪配置寄存器0X1B内写入0x18，设置范围为±2000deg/s。换算关系：2^16/4000=16.4LSB/(°/S)
+	//陀螺仪配置寄存器0X1B内写入0x18，设置范围为±2000deg/s。换算关系：2^16/(2000*2)=16.4LSB/(°/S)
 	////计算角速度
-	if(gyro1_x<32768) gyro1_x=-(gyro1_x/16.4);
-	if(gyro1_x>32768) gyro1_x=+(65535-gyro1_x)/16.4;
-	if(gyro1_y<32768) gyro1_y=-(gyro1_y/16.4);
-	if(gyro1_y>32768) gyro1_y=+(65535-gyro1_y)/16.4;
-	if(gyro1_z<32768) gyro1_z=-(gyro1_z/16.4);
-	if(gyro1_z>32768) gyro1_z=+(65535-gyro1_z)/16.4;
+    float gyrox = (float)raw_data[3] / 16.4;  // 需根据陀螺仪量程调整
+    float gyroy = (float)raw_data[4] / 16.4;
+    float gyroz = (float)raw_data[5] / 16.4;
 
-
-    if(gyro2_x<32768) gyro2_x=-(gyro2_x/16.4);
-	if(gyro2_x>32768) gyro2_x=+(65535-gyro2_x)/16.4;
-	if(gyro2_y<32768) gyro2_y=-(gyro2_y/16.4);
-	if(gyro2_y>32768) gyro2_y=+(65535-gyro2_y)/16.4;
-	if(gyro2_z<32768) gyro2_z=-(gyro2_z/16.4);
-	if(gyro2_z>32768) gyro2_z=+(65535-gyro2_z)/16.4;
-
-    data[0] = accx1;
-    data[1] = accy1;
-    data[2] = accz1;
-    data[3] = gyro1_x;
-    data[4] = gyro1_y;
-    data[5] = gyro1_z;
-    data[6] = accx2;
-    data[7] = accy2;
-    data[8] = accz2;
-    data[9] = gyro2_x;
-    data[10] = gyro2_y;
-    data[11] = gyro2_z;
+    data[0] = accx;
+    data[1] = accy;
+    data[2] = accz;
+    data[3] = gyrox;
+    data[4] = gyroy;
+    data[5] = gyroz;
 }
 
-void mpu6050_init(const char *name)
+struct rt_i2c_bus_device * mpu6050_init(const char *name)
 {
     rt_uint8_t temp[2] = {0, 0};
-
+    struct rt_i2c_bus_device *i2c_bus = RT_NULL;
+    
     /* 查找I2C总线设备，获取I2C总线设备句柄 */
     i2c_bus = (struct rt_i2c_bus_device *)rt_device_find(name);
 
@@ -217,26 +171,35 @@ void mpu6050_init(const char *name)
     }
     else
     {
+        /* 将x轴作为陀螺仪的时钟参考，手册强烈推荐 */
         rt_uint8_t data = 0x01;
         write_reg(i2c_bus,MPU6050_PWR_MGMT_1,&data);
+        /* 配置低功耗参数，默认不设置低功耗 */
         data = 0x00;
         write_reg(i2c_bus,MPU6050_PWR_MGMT_2,&data);
+        /* 设置传感器采样率为（传感器输出频率）/（1 + 0x09） */
         data = 0x09;
         write_reg(i2c_bus,MPU6050_SMPLRT_DIV,&data);
+        /* 设置传感器输出频率：带宽5Hz，延迟19ms。这是最平滑的滤波，会将一部分测量误差剔除 */
         data = 0x06;
         write_reg(i2c_bus,MPU6050_CONFIG,&data);
-        data = 0x18;    //range:± 2000 °/s sensitivity:16.4 LSB/°/s
+        /* 设置陀螺仪传感器的测量范围：± 2000 °/s，灵敏度：16.4 LSB，此处还可以设置陀螺仪自检 */
+        data = 0x18;    
         write_reg(i2c_bus,MPU6050_GYRO_CONFIG,&data);
-        data = 0x18;    //range:± 16g
+        /* 设置加速度传感器的测量范围：± 16g，此处还可以设置加速度计自检 */
+        data = 0x18;    
         write_reg(i2c_bus,MPU6050_ACCEL_CONFIG,&data); 
 
         initialized = RT_TRUE;
     }
+
+    return i2c_bus;
 }
 
-static void i2c_mpu6050_sample(int argc, char *argv[])
+static void i2c_mpu6050_sample(rt_base_t argc, char *argv[])
 {
     rt_int16_t raw_AX,raw_AY,raw_AZ,raw_GX,raw_GY,raw_GZ;
+    struct rt_i2c_bus_device *i2c_bus0 = RT_NULL;
     char name[RT_NAME_MAX];
     rt_uint8_t buf;
     if (argc == 2)
@@ -251,14 +214,13 @@ static void i2c_mpu6050_sample(int argc, char *argv[])
     if (!initialized)
     {
         /* 传感器初始化 */
-        mpu6050_init(name);
+        i2c_bus0 = mpu6050_init(name);
     }
     if (initialized)
     {
-        read_id(&buf);
+        read_id(i2c_bus0, &buf);
 
-        /* 读取温湿度数据 */
-        read_data(&raw_AX,&raw_AY,&raw_AZ,\
+        read_data(i2c_bus0, &raw_AX,&raw_AY,&raw_AZ,\
             &raw_GX,&raw_GY,&raw_GZ);
 
         rt_kprintf("Ax:%5d\tAY:%5d\tAZ:%5d\r\nGx:%5d\tGY:%5d\tGZ:%5d\r\n", raw_AX,raw_AY,raw_AZ,raw_GX,raw_GY,raw_GZ);

@@ -1,9 +1,7 @@
 #include <rthw.h>
 #include <rtthread.h>
 
-#include "/home/lzx/rt-thread/rt-thread/components/drivers/wlan/dev_wlan_mgnt.h"
-#include "/home/lzx/rt-thread/rt-thread/components/drivers/wlan/dev_wlan_prot.h"
-#include "/home/lzx/rt-thread/rt-thread/components/drivers/wlan/dev_wlan_cfg.h"
+#include "dev_wlan_mgnt.h"
 
 #define WLAN_SSID               "rtthread"
 #define WLAN_PASSWORD           "12345678"

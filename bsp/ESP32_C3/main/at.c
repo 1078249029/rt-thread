@@ -1,21 +1,15 @@
-#include "klibc/kstring.h"
-#include "rthw.h"
-#include "rttypes.h"
-#include <stdlib.h>
-#include <stdio.h>
-//#include <string.h>
 #include <rtthread.h>
+#include <string.h>
+#include <stdio.h>
 #include <at.h>
 #include <rtdbg.h>
-
-#include "/home/lzx/rt-thread/rt-thread/components/libc/compilers/common/include/posix/string.h"
 #include "mpu6050.h"
+#include "rttypes.h"
 
-
-int at_cwmode(rt_int8_t mode)
+rt_base_t at_cwmode(rt_int8_t mode)
 {
     at_response_t resp = RT_NULL;
-    int result = 0;
+    rt_base_t result = 0;
     resp = at_create_resp(256, 0, rt_tick_from_millisecond(10000));
     if (resp == RT_NULL)
     {
@@ -84,10 +78,10 @@ __exit:
     return -1;
 }
 
-int at_cwjap(void)
+rt_base_t at_cwjap(void)
 {
     at_response_t resp = RT_NULL;
-    int result = 0;
+    rt_base_t result = 0;
     resp = at_create_resp(256, 0, rt_tick_from_millisecond(10000));
     if (resp == RT_NULL)
     {
@@ -106,7 +100,7 @@ int at_cwjap(void)
     const char * resp_expr = "%*[^\"]\"%[^\"]\"";
 
     LOG_D("Parse arguments");
-    for(int i = 1; i < 4; i++){
+    for(rt_base_t i = 1; i < 4; i++){
         if (at_resp_parse_line_args(resp, i, resp_expr, resp_arg) > 0)
         {
             LOG_D("%s", resp_arg);
@@ -131,10 +125,10 @@ __exit:
     return -1;
 }
 
-int at_cifsr(void)
+rt_base_t at_cifsr(void)
 {
     at_response_t resp = RT_NULL;
-    int result = 0;
+    rt_base_t result = 0;
     resp = at_create_resp(256, 0, rt_tick_from_millisecond(5000));
     if (resp == RT_NULL)
     {
@@ -153,7 +147,7 @@ int at_cifsr(void)
     const char * resp_expr = "%*[^\"]\"%[^\"]\"";
 
     LOG_D("Parse arguments");
-    for(int i = 1; i < 7; i++){
+    for(rt_base_t i = 1; i < 7; i++){
         if (at_resp_parse_line_args(resp, i, resp_expr, resp_arg) > 0)
         {
             LOG_D("%s", resp_arg);
@@ -178,10 +172,10 @@ __exit:
     return -1;
 }
 
-int at_cipstart(char* protol, char* ip, char* port)
+rt_base_t at_cipstart(char* protol, char* ip, char* port)
 {
     at_response_t resp = RT_NULL;
-    int result = 0;
+    rt_base_t result = 0;
     resp = at_create_resp(256, 0, rt_tick_from_millisecond(5000));
     if (resp == RT_NULL)
     {
@@ -208,7 +202,7 @@ int at_cipstart(char* protol, char* ip, char* port)
     const char * resp_expr = "%*[^\"]\"%[^\"]\"";
 
     LOG_D("Parse arguments");
-    for(int i = 1; i < 2; i++){
+    for(rt_base_t i = 1; i < 2; i++){
         if (at_resp_parse_line_args(resp, i, resp_expr, resp_arg) > 0)
         {
             LOG_D("%s %s %s: %s", protol, ip, port,resp_arg);
@@ -233,10 +227,10 @@ __exit:
     return -1;
 }
 
-int at_cipsend(void)
+rt_base_t at_cipsend(void)
 {
     at_response_t resp = RT_NULL;
-    int result = 0;
+    rt_base_t result = 0;
     resp = at_create_resp(256, 0, rt_tick_from_millisecond(5000));
     if (resp == RT_NULL)
     {
@@ -255,7 +249,7 @@ int at_cipsend(void)
     const char * resp_expr = "%*[^\"]\"%[^\"]\"";
 
     LOG_D("Parse arguments");
-    for(int i = 1; i < 2; i++){
+    for(rt_base_t i = 1; i < 2; i++){
         if (at_resp_parse_line_args(resp, i, resp_expr, resp_arg) > 0)
         {
             LOG_D("at_cipsend: %s",resp_arg);
@@ -280,10 +274,10 @@ __exit:
     return -1;
 }
 
-int at_senddata(char* data)
+rt_base_t at_senddata(char* data)
 {
     at_response_t resp = RT_NULL;
-    int result = 0;
+    rt_base_t result = 0;
 
     if(sizeof(data) > 1460)
     {
@@ -309,7 +303,7 @@ int at_senddata(char* data)
     const char * resp_expr = "%*[^\"]\"%[^\"]\"";
 
     LOG_D("Parse arguments");
-    for(int i = 1; i < 2; i++){
+    for(rt_base_t i = 1; i < 2; i++){
         if (at_resp_parse_line_args(resp, i, resp_expr, resp_arg) > 0)
         {
             LOG_D("at_senddata: %s",resp_arg);
@@ -334,10 +328,10 @@ __exit:
     return -1;
 }
 
-int at_stopsend(void)
+rt_base_t at_stopsend(void)
 {
     at_response_t resp = RT_NULL;
-    int result = 0;
+    rt_base_t result = 0;
 
     resp = at_create_resp(256, 0, rt_tick_from_millisecond(5000));
     if (resp == RT_NULL)
@@ -366,10 +360,10 @@ __exit:
     return -1;
 }
 
-int at_cipmode(rt_int8_t mode)
+rt_base_t at_cipmode(rt_int8_t mode)
 {
     at_response_t resp = RT_NULL;
-    int result = 0;
+    rt_base_t result = 0;
     resp = at_create_resp(256, 0, rt_tick_from_millisecond(5000));
     if (resp == RT_NULL)
     {
@@ -405,7 +399,7 @@ int at_cipmode(rt_int8_t mode)
     const char * resp_expr = "%*[^\"]\"%[^\"]\"";
 
     LOG_D("Parse arguments");
-    for(int i = 1; i < 3; i++){
+    for(rt_base_t i = 1; i < 3; i++){
         if (at_resp_parse_line_args(resp, i, resp_expr, resp_arg) > 0)
         {
             LOG_D("%s", resp_arg);
@@ -430,10 +424,10 @@ __exit:
     return -1;
 }
 
-int at_rst(void)
+rt_base_t at_rst(void)
 {
     at_response_t resp = RT_NULL;
-    int result = 0;
+    rt_base_t result = 0;
 
     resp = at_create_resp(256, 0, rt_tick_from_millisecond(5000));
     if (resp == RT_NULL)
@@ -466,41 +460,19 @@ __exit:
 #define WIFI_DELAY    15000  
 #define DATA_DELAY    10  
 
-int at_client_test(void)
+rt_base_t at_client_test(void)
 {
+    struct rt_i2c_bus_device *i2c_bus0 = RT_NULL;     /* I2C总线设备句柄 */
+    struct rt_i2c_bus_device *i2c_bus1 = RT_NULL;     /* I2C总线设备句柄 */
+
     char protol[]={"\"TCP\""};
-    char ip[]={"\"192.168.40.190\""};
+    char ip[]={"\"192.168.241.190\""};
     char port[]={"8080"};
-    float mpu6050_data[14]={0};
+    float mpu6050_0_data[6] = {0};
+    float mpu6050_1_data[6] = {0};
     
-    char ax1_char[6];
-    char ay1_char[6];
-    char az1_char[6];
-    char gyrox1_char[6];
-    char gyroy1_char[6];
-    char gyroz1_char[6];
-
-    float ax1_float;
-    float ay1_float;
-    float az1_float;
-    float gyrox1_float;
-    float gyroy1_float;
-    float gyroz1_float;
-    
-    char ax2_char[6] = {0};
-    char ay2_char[6] = {0};
-    char az2_char[6] = {0};
-    char gyrox2_char[6] = {0};
-    char gyroy2_char[6] = {0};
-    char gyroz2_char[6] = {0};
-
-    float ax2_float;
-    float ay2_float;
-    float az2_float;
-    float gyrox2_float;
-    float gyroy2_float;
-    float gyroz2_float;
-
+    char mpu6050_0[6][6] = {0};
+    char mpu6050_1[6][6] = {0};
     char dest[100] = {0};
     char comma[]={","};
 
@@ -508,8 +480,8 @@ int at_client_test(void)
     at_client_init("uart1",512,512);
     char mpu6050_id_char[5];
 
-    mpu6050_init("i2c0");
-    mpu6050_init("i2c1");
+    i2c_bus0 = mpu6050_init("i2c0");
+    i2c_bus1 = mpu6050_init("i2c1");
 
     at_cwmode(3);
     at_rst();
@@ -525,66 +497,28 @@ int at_client_test(void)
     at_cipsend();
     rt_thread_mdelay(COMMAND_DELAY);
     
-    read_id(&buf);
-    utoa((unsigned int)buf, &mpu6050_id_char[0], 10);
+    read_id(i2c_bus0,&buf);
+    utoa((rt_uint32_t)buf, &mpu6050_id_char[0], 10);
     at_senddata("id: ");
     at_senddata(mpu6050_id_char);
     at_senddata("data: ");
-    for(int i = 0; i < 1500; i++){
-        /* 读取温湿度数据 */
-        read_signed_data(mpu6050_data);
-        ax1_float = (mpu6050_data[0]);
-        ay1_float = (mpu6050_data[1]);
-        az1_float = (mpu6050_data[2]);
+    for(rt_base_t i = 0; i < 1500; i++){
+        
+        read_signed_data(i2c_bus0,&mpu6050_0_data[0]);
+        read_signed_data(i2c_bus1,&mpu6050_1_data[6]);
 
-        gyrox1_float = (mpu6050_data[3]);
-        gyroy1_float = (mpu6050_data[4]);
-        gyroz1_float = (mpu6050_data[5]);
-
-        ax2_float = (mpu6050_data[6]);
-        ay2_float = (mpu6050_data[7]);
-        az2_float = (mpu6050_data[8]);
-
-        gyrox2_float = (mpu6050_data[9]);
-        gyroy2_float = (mpu6050_data[10]);
-        gyroz2_float = (mpu6050_data[11]);
-        sprintf(ax1_char,"%.2f",ax1_float);
-        sprintf(ay1_char,"%.2f",ay1_float);
-        sprintf(az1_char,"%.2f",az1_float);
-        sprintf(gyrox1_char,"%.2f",gyrox1_float);
-        sprintf(gyroy1_char,"%.2f",gyroy1_float);
-        sprintf(gyroz1_char,"%.2f",gyroz1_float);
-
-        sprintf(ax2_char,"%.2f",ax2_float);
-        sprintf(ay2_char,"%.2f",ay2_float);
-        sprintf(az2_char,"%.2f",az2_float);
-        sprintf(gyrox2_char,"%.2f",gyrox2_float);
-        sprintf(gyroy2_char,"%.2f",gyroy2_float);
-        sprintf(gyroz2_char,"%.2f",gyroz2_float);
-        strcat(dest, ax1_char);
-        strcat(dest, comma);
-        strcat(dest, ay1_char);
-        strcat(dest, comma);
-        strcat(dest, az1_char);
-        strcat(dest, comma);
-        strcat(dest, gyrox1_char);
-        strcat(dest, comma);
-        strcat(dest, gyroy1_char);
-        strcat(dest, comma);
-        strcat(dest, gyroz1_char);
-        strcat(dest, comma);
-
-        strcat(dest, ax2_char);
-        strcat(dest, comma);
-        strcat(dest, ay2_char);
-        strcat(dest, comma);
-        strcat(dest, az2_char);
-        strcat(dest, comma);
-        strcat(dest, gyrox2_char);
-        strcat(dest, comma);
-        strcat(dest, gyroy2_char);
-        strcat(dest, comma);
-        strcat(dest, gyroz2_char);
+        for(rt_base_t j = 0; j < 6; j++)
+        {
+            sprintf(&mpu6050_0[j][0], "%.2f", mpu6050_0_data[j]);
+            sprintf(&mpu6050_1[j][0], "%.2f", mpu6050_1_data[j]);
+            strcat(dest, &mpu6050_0[j][0]);
+            strcat(dest, comma);
+            strcat(dest, &mpu6050_1[j][0]);
+            if(j < 5)
+            {
+                strcat(dest, comma);
+            }
+        }
         at_senddata(dest);
         rt_memset(dest, 0, sizeof(dest));
         rt_thread_mdelay(20);
@@ -601,7 +535,7 @@ int at_client_test(void)
 /* 设置当前 AT 客户端最大支持的一次接收数据的长度 */
 #define AT_CLIENT_RECV_BUFF_LEN         512
 #define AT_CLIENT_SEND_BUFF_LEN         512
-int at_client_test_init(int argc, char**argv)
+rt_base_t at_client_test_init(rt_base_t argc, char**argv)
 {
     if (argc != 2)
     {

@@ -14,8 +14,8 @@
 #include <rtdevice.h>
 #include <board.h>
 
-#include "/home/lzx/rt-thread/rt-thread/bsp/ESP32_C3/packages/ESP-IDF-latest/tools/mocks/hal/include/hal/gpio_types.h"
-#include "/home/lzx/rt-thread/rt-thread/bsp/ESP32_C3/drivers/drv_spi.h"
+#include "packages/ESP-IDF-latest/tools/mocks/hal/include/hal/gpio_types.h"
+#include "drivers/drv_spi.h"
 
 #define W25Q_SPI_DEVICE_NAME "spi20"
 #define SPI_BUS_NAME "spi2"
@@ -54,7 +54,7 @@ void spi_w25q_sample(void)
         rt_spi_transfer_message(spi_w25q, &msg1);
         rt_kprintf("use rt_spi_transfer_message() read w25q ID is:%x%x\n", id[2], id[3]);
     }
-    for(int a = 0; a < sizeof(id); a++)
+    for(rt_base_t a = 0; a < sizeof(id); a++)
     {
         rt_kprintf("id is:%x\t", id[a]);
     }
@@ -74,7 +74,7 @@ void app_main()
 // #define USING_WIFI_IN_MAIN
 
 
-int main(void)
+rt_base_t main(void)
 {
     rt_kprintf("Hello!RT-THREAD!\r\n");
     rt_pin_mode(RT_BSP_LED_PIN, PIN_MODE_OUTPUT);
